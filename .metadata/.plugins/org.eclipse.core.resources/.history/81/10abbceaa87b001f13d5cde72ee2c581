@@ -1,0 +1,5 @@
+package com.api.digital.security.model;
+
+public class Device {
+
+}
