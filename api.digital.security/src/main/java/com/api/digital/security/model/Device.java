@@ -12,7 +12,7 @@ public class Device {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 	private String name;
-	private String ipAdress;
+	private String ipAddress;
 	private String location;
 	
 	
@@ -20,7 +20,7 @@ public class Device {
 		return id;
 	}
 	public void setId(Long id) {
-		this.id = id;
+		this.id = id; 
 	}
 	public String getName() {
 		return name;
@@ -28,11 +28,11 @@ public class Device {
 	public void setName(String name) {
 		this.name = name;
 	}
-	public String getIpAdress() {
-		return ipAdress;
+	public String getIpAddress() {
+		return ipAddress;
 	}
-	public void setIpAdress(String ipAdress) {
-		this.ipAdress = ipAdress;
+	public void setIpAddress(String ipAddress) {
+		this.ipAddress = ipAddress;
 	}
 	public String getLocation() {
 		return location;

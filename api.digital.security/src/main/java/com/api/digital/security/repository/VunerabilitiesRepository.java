@@ -8,5 +8,6 @@ import com.api.digital.security.model.Vunerabilities;
 
 public interface VunerabilitiesRepository extends JpaRepository<Vunerabilities, Long> {
 	List<Vunerabilities> findByName(String name);
+	List<Vunerabilities> findByDeviceId(Long deviceId);
 
 }

@@ -52,10 +52,11 @@ public class VunerabilitiesController {
 	//Rota para deletar uma vulnerabilidade
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Void> deleteVunerabilities(@PathVariable Long id){
-		return vunerabilitiesRepository.findById(id)
-				.map(vunerabilities -> {
-					vunerabilitiesRepository.delete(vunerabilities);
-					return ResponseEntity.noContent().build();
-				}).orElse(ResponseEntity.notFound().build());
+		if(!vunerabilitiesRepository.existsById(id)) {
+			return ResponseEntity.notFound().build();
+		}
+		
+		vunerabilitiesRepository.deleteById(id);
+		return ResponseEntity.noContent().build();
 	}
 }

@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename field &apos;ipAdress&apos; in &apos;com.api.digital.security.model.Device&apos; to &apos;ipAddress&apos;&#x0D;&#x0A;- Original project: &apos;api.digital.security&apos;&#x0D;&#x0A;- Original element: &apos;com.api.digital.security.model.Device.ipAdress&apos;&#x0D;&#x0A;- Renamed element: &apos;com.api.digital.security.model.Device.ipAddress&apos;&#x0D;&#x0A;- Update references to refactored element&#x0D;&#x0A;- Update textual occurrences in comments and strings" delegate="false" deprecate="false" description="Rename field &apos;ipAdress&apos;" flags="589826" getter="false" id="org.eclipse.jdt.ui.rename.field" input="/src\/main\/java=/optional=/true=/=/maven.pomderived=/true=/&lt;com.api.digital.security.model{Device.java[Device^ipAdress" name="ipAddress" references="true" setter="false" stamp="1727640741542" textual="false" version="1.0"/>
+</session>

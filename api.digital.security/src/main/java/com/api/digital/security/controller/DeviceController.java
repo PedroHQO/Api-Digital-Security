@@ -34,12 +34,19 @@ public class DeviceController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(savDevice);
 	}
 	
-	//rotas para buscar um dispositivo pelo ID
+	//Listar todos os dispositivos
+	@GetMapping
+	public ResponseEntity<List<Device>> getAllDevices(){
+		List<Device> devices = deviceRepository.findAll();
+		return ResponseEntity.ok(devices);
+	}
+	
+	//Rotas para buscar um dispositivo pelo ID
 	@GetMapping("/{id}")
 	public ResponseEntity<Device> getDeviceById(@PathVariable Long id){
 		return deviceRepository.findById(id)
-				.map(ResponseEntity::ok)
-				.orElse(ResponseEntity.notFound().build());
+				.map(ResponseEntity::ok)//200 ok
+				.orElse(ResponseEntity.notFound().build());//404 Not Found
 		
 	}
 	
@@ -49,7 +56,7 @@ public class DeviceController {
 			return deviceRepository.findById(id)
 					.map(device -> {
 						device.setName(deviceDetails.getName());
-						device.setIpAdress(deviceDetails.getIpAdress());
+						device.setIpAddress(deviceDetails.getIpAddress());
 						device.setLocation(deviceDetails.getLocation());
 						Device updateDevice = deviceRepository.save(device);
 						return ResponseEntity.ok(updateDevice);
@@ -57,14 +64,15 @@ public class DeviceController {
 			
 		}
 		
-		//para deletar um disposito
+		//Para deletar um disposito baseado no seu id
 		@DeleteMapping("/{id}")
 		public ResponseEntity<Void> deleteDevice(@PathVariable Long id){
-			return deviceRepository.findById(id)
-					.map(device -> {
-						deviceRepository.delete(device);
-						return ResponseEntity.noContent().build();
-					}).orElse(ResponseEntity.notFound().build());
+			if(!deviceRepository.existsById(id)){
+				return ResponseEntity.notFound().build(); //retorna 404 se não encontrar o id
+			}
+			
+			deviceRepository.deleteById(id);//Exclui o dispositivo se tiver o id
+			return ResponseEntity.noContent().build();//Retorno 204 No content
 		}
 	
 	

@@ -15,10 +15,12 @@ public class Vunerabilities {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
+	private String name;
 	private String description;
 	private LocalDateTime detectedAt;
 	@ManyToOne
 	private Device device;
+	
 	public Long getId() {
 		return id;
 	}
@@ -42,6 +44,12 @@ public class Vunerabilities {
 	}
 	public void setDevice(Device device) {
 		this.device = device;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
 	}
 	
 	
