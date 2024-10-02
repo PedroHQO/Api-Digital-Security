@@ -12,8 +12,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
+import com.api.digital.security.model.Device;
 import com.api.digital.security.model.Vunerabilities;
+import com.api.digital.security.repository.DeviceRepository;
 import com.api.digital.security.repository.VunerabilitiesRepository;
 
 @RestController
@@ -22,11 +25,23 @@ public class VunerabilitiesController {
 	
 	@Autowired
 	private VunerabilitiesRepository vunerabilitiesRepository;
+	
+	@Autowired
+	private DeviceRepository deviceRepository;
+	
 	//Rota para adicionar uma nova vulnerabilidade:
 	@PostMapping
 	public ResponseEntity<Vunerabilities> createVunerabilities(@RequestBody Vunerabilities vunerabilities){
+		Long deviceId = vunerabilities.getDevice().getId();
+		Device device = deviceRepository.findById(deviceId)
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Lamento. Dispositivo não encontrado!"));
+		
+		vunerabilities.setDevice(device);
+		
 		Vunerabilities saveVunerabilities = vunerabilitiesRepository.save(vunerabilities);
+		
 		return ResponseEntity.status(HttpStatus.CREATED).body(saveVunerabilities);
+		
 	}
 	
 	//Rota para listar todas as vulnerabilidades
