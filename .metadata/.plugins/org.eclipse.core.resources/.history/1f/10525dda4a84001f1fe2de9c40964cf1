@@ -1,0 +1,60 @@
+package com.api.digital.security.authenticate;
+
+import java.util.Date;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
+import java.security.Key;
+
+
+
+@Component
+public class JWTTokenProvider {
+	
+	@Value("${jwt.secret}")
+	private String jwtSecret;
+	
+	@Value("${jwt.expiration}")
+	private int jwtExpirationInMs;
+	
+	//Metodo para gerar o token
+	public String generateToken(String username) {
+		Date now = new Date();
+		Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);
+		
+		
+		
+		return Jwts.builder()
+				.setSubject(username)
+				.setIssuedAt(new Date())
+				.setExpiration(expiryDate)
+				.signWith(SignatureAlgorithm.HS512, jwtSecret)
+				.compact();
+	}
+	
+	//metodo para obter o username do toke
+	public String getUsernameFromJWT(String token) {
+		Claims claims = Jwts.parser()
+				.setSigningKey(jwtSecret)
+				.parseClaimsJws(token)
+				.getBody();
+		
+		return claims.getSubject();
+	}
+	
+	//Metodo para validar o token
+	public boolean validateToken(String token) {
+		try {
+			Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token);
+			return true;
+		}catch(Exception ex) {
+			return false;
+		}
+	}
+}
