@@ -14,7 +14,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.api.digital.security.authenticate.JWTTokenProvider;
+import com.api.digital.security.authenticate.JwtAuthenticationResponse;
 import com.api.digital.security.model.Device;
+import com.api.digital.security.model.LoginRequest;
 import com.api.digital.security.repository.DeviceRepository;
 
 @RestController
@@ -22,10 +25,19 @@ import com.api.digital.security.repository.DeviceRepository;
 public class DeviceController {
 
 	@Autowired
+	JWTTokenProvider jwtTokenProvider;
+	
+	@Autowired
 	private DeviceRepository deviceRepository;
 	//O método retorna uma lista (List<Device>) de dispositivos que correspondem ao nome informado.
 	public List<Device> getDevicesByName(String name){
 		return deviceRepository.findByName(name);
+	}
+	
+	@PostMapping("/login")
+	public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest){
+		String token = jwtTokenProvider.generateToken(loginRequest.getUsername());
+		return ResponseEntity.ok(new JwtAuthenticationResponse(token));
 	}
 	
 	@PostMapping

@@ -17,9 +17,6 @@ import java.security.Key;
 @Component
 public class JWTTokenProvider {
 	
-	@Value("${jwt.secret}")
-	private String jwtSecret;
-	
 	@Value("${jwt.expiration}")
 	private int jwtExpirationInMs;
 	
@@ -61,7 +58,7 @@ public class JWTTokenProvider {
 	
 	//metodo auxiliar para obter a chave assinante codificada em Base64
 	private Key getSigningKey() {
-		return Keys.secretKeyFor(SignatureAlgorithm.HS256);
+		return Keys.secretKeyFor(SignatureAlgorithm.HS512);
 	}
 	
 	
