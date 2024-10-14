@@ -1,5 +1,7 @@
 package com.api.digital.security.filter;
 
+import java.io.IOException;
+
 import org.springframework.aop.ThrowsAdvice;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -11,7 +13,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.api.digital.security.authenticate.JWTTokenProvider;
 
-import io.jsonwebtoken.io.IOException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,7 +32,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter{
 	
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) 
-		throws ServletException, IOException, java.io.IOException{
+		throws ServletException, IOException{
 		
 		//Extaira o token JWT do cabeçalho
 		String token = getJWTFromRequest(request);
@@ -45,12 +46,14 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter{
 			//carrega os detalhes do usuário
 			UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 			
-			//Cria a autenticação com os detalhes do usuário
-			UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-			authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-			
-			//Define a autenticação no contaexto do Spring Security
-			SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+			if(userDetails != null) {
+				//Cria a autenticação com os detalhes do usuário
+				UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+				authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+				
+				//Define a autenticação no contexto do Spring Security
+				SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+			}
 		}
 		
 		//Continua a cadeia de filtros
