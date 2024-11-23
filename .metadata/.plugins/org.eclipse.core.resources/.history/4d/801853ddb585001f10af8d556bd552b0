@@ -1,5 +1,0 @@
-package com.api.digital.security.filter;
-
-public class JWTAuthenticationFilter {
-
-}

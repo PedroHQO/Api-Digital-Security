@@ -1,0 +1,12 @@
+package com.api.digital.security.exceptions;
+
+public class AuthorizationNo extends RuntimeException {
+	
+	public UserNotAuthorizationException() {
+		super("Acesso bloqueado por falta de permissão!");
+	}
+	
+	public UserNotAuthorizationException(String message) {
+		super(message);
+	}
+}

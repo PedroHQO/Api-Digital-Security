@@ -1,0 +1,12 @@
+package com.api.digital.security.exceptions;
+
+public class TokenExperidException extends RuntimeException {
+	
+	public TokenExperidException() {
+		super("Ação bloqueada por falta de permissão. Verifique seu Usuário ou Token");
+	}
+	
+	public TokenExperidException(String message) {
+		super(message);
+	}
+}

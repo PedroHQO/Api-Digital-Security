@@ -20,6 +20,9 @@ public class JWTTokenProvider {
 	@Value("${jwt.expiration}")
 	private int jwtExpirationInMs;
 	
+	@Value("${jwt.secret}")
+	private String jwtSecret;
+	
 	//Metodo para gerar o token
 	public String generateToken(String username) {
 		Date now = new Date();
@@ -58,7 +61,7 @@ public class JWTTokenProvider {
 	
 	//metodo auxiliar para obter a chave assinante codificada em Base64
 	private Key getSigningKey() {
-		return Keys.secretKeyFor(SignatureAlgorithm.HS512);
+		return Keys.hmacShaKeyFor(jwtSecret.getBytes());
 	}
 	
 	

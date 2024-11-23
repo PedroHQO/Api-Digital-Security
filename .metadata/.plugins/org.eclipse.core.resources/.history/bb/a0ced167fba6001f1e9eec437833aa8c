@@ -1,0 +1,20 @@
+package com.api.digital.security.infra;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+
+import com.api.digital.security.exceptions.UserNotAuthorizationException;
+
+@ControllerAdvice
+public class RestExceptionHandler extends ResponseEntityExceptionHandler{
+	
+	@ExceptionHandler(UsernameNotFoundException .class)
+	private ResponseEntity<String> userNotAauthorizationHandler(UserNotAuthorizationException exception){
+		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Ação bloqueada por falta de permissão. Verifique seu Usuário ou Token");
+	}
+	
+}
