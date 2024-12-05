@@ -25,6 +25,5 @@ public class DeviceService {
 		
 		return deviceMapper.convertToDTO(device);
 	}
-	
-	
+
 }

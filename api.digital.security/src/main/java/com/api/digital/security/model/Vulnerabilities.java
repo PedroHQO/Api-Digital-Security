@@ -23,7 +23,7 @@ public class Vulnerabilities {
 	private LocalDateTime detectedAt;
 	
 	@ManyToOne
-	@JoinColumn(name = "device_id", nullable = false)
+	@JoinColumn(name = "device_id")
 	@JsonIgnore
 	private Device device;
 	

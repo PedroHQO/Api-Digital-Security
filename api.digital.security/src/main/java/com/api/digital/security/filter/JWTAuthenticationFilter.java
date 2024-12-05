@@ -21,63 +21,62 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 @Component
-public class JWTAuthenticationFilter extends OncePerRequestFilter{
-	
+public class JWTAuthenticationFilter extends OncePerRequestFilter {
+
 	private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(JWTAuthenticationFilter.class);
-	
+
 	private final JWTTokenProvider jwtTokenProvider;
 	private final UserDetailsService userDetailsService;
-	
 
 	public JWTAuthenticationFilter(JWTTokenProvider jwtTokenProvider, UserDetailsService userDetailsService) {
 		this.jwtTokenProvider = jwtTokenProvider;
 		this.userDetailsService = userDetailsService;
 	}
-	
+
 	@Override
-	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) 
-		throws ServletException, IOException{
-		
-		//Extaira o token JWT do cabeçalho
+	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+			throws ServletException, IOException {
+
+		// Extaira o token JWT do cabeçalho
 		String token = getJWTFromRequest(request);
-		if(token != null) {
+		if (token != null) {
 			LOGGER.debug("Token extraído do cabeçalho: {}", token);
 		}
-		
-		
-		//Valida o token e se o contexto de segurança ainda não possui autenticação
-		if(token != null && jwtTokenProvider.validateToken(token) 
+
+		// Valida o token e se o contexto de segurança ainda não possui autenticação
+		if (token != null && jwtTokenProvider.validateToken(token)
 				&& SecurityContextHolder.getContext().getAuthentication() == null) {
 			LOGGER.debug("Token é válido");
-			
-			//Extrai o nome de usuário do token
+
+			// Extrai o nome de usuário do token
 			String username = jwtTokenProvider.getUsernameFromJWT(token);
 			LOGGER.debug("Usuário extráido do token: {}", username);
-			
-			//carrega os detalhes do usuário
+
+			// carrega os detalhes do usuário
 			UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-			
-			if(userDetails != null) {
-				//Cria a autenticação com os detalhes do usuário
-				UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+
+			if (userDetails != null) {
+				// Cria a autenticação com os detalhes do usuário
+				UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+						userDetails, null, userDetails.getAuthorities());
 				authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-				
-				//Define a autenticação no contexto do Spring Security
+
+				// Define a autenticação no contexto do Spring Security
 				SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 				LOGGER.debug("Autenticação definida para o usuário: {}", username);
 			}
 		} else {
 			LOGGER.warn("Token inválido ou não encontrado");
 		}
-		
-		//Continua a cadeia de filtros
-		filterChain.doFilter(request, response);	
+
+		// Continua a cadeia de filtros
+		filterChain.doFilter(request, response);
 	}
-	
-	//Extarai o token JWT do cabeçalho Authorization
+
+	// Extarai o token JWT do cabeçalho Authorization
 	private String getJWTFromRequest(HttpServletRequest request) {
 		String bearerToken = request.getHeader("Authorization");
-		if(bearerToken != null && bearerToken.startsWith("Bearer ")) {
+		if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
 			return bearerToken.substring(7); // Removerá o "BEarer " e retorna o token
 		}
 		return null;

@@ -1,5 +1,0 @@
-package com.api.digital.security.infra;
-
-public class RestExceptionHandler {
-
-}

@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.api.digital.security.authenticate.JWTTokenProvider;
 import com.api.digital.security.authenticate.JwtAuthenticationResponse;
 import com.api.digital.security.dto.DeviceDataTransferObject;
+import com.api.digital.security.exceptions.DeviceDependencyException;
 import com.api.digital.security.exceptions.IdNotFoudException;
 import com.api.digital.security.model.Device;
 import com.api.digital.security.model.LoginRequest;
@@ -31,86 +32,90 @@ import com.api.digital.security.service.DeviceService;
 public class DeviceController {
 
 	@Autowired
+	DeviceDataTransferObject dataTransferObject;
+
+	@Autowired
 	JWTTokenProvider jwtTokenProvider;
-	
+
 	@Autowired
 	private DeviceRepository deviceRepository;
-	
+
 	@Autowired
 	private final DeviceService deviceService;
-	
+
 	public DeviceController(DeviceService deviceService) {
 		this.deviceService = deviceService;
 	}
 
-	//O método retorna uma lista (List<Device>) de dispositivos que correspondem ao nome informado.
-	public List<Device> getDevicesByName(String name){
+	// O método retorna uma lista (List<Device>) de dispositivos que correspondem ao
+	// nome informado.
+	public List<Device> getDevicesByName(String name) {
 		return deviceRepository.findByName(name);
 	}
-	
+
 	@PostMapping("/login")
 	@PreAuthorize("hasAnyRole('ADMIN', 'COMMON_USER')")
-	public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest){
+	public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
 		String token = jwtTokenProvider.generateToken(loginRequest.getUsername());
 		return ResponseEntity.ok(new JwtAuthenticationResponse(token));
 	}
-	
+
 	@PreAuthorize("hasAnyRole('ADMIN', 'COMMON_USER')")
-	@PostMapping
-	public ResponseEntity<DeviceDataTransferObject> createDevice(@RequestBody DeviceDataTransferObject deviceDataTransferObject){
+	@PostMapping("Criar")
+	public ResponseEntity<DeviceDataTransferObject> createDevice(
+			@RequestBody DeviceDataTransferObject deviceDataTransferObject) {
 		Device device = DeviceMapper.convertToEntity(deviceDataTransferObject);
 		Device savedDevice = deviceRepository.save(device);
 		DeviceDataTransferObject savedDataTransferObject = DeviceMapper.convertToDTO(savedDevice);
 		return ResponseEntity.status(HttpStatus.CREATED).body(savedDataTransferObject);
 	}
-	
-	//Listar todos os dispositivos
+
+	// Listar todos os dispositivos
 	@PreAuthorize("hasAnyRole('ADMIN', 'COMMON_USER')")
-	@GetMapping
-	public ResponseEntity<List<DeviceDataTransferObject>> getAllDevices(){
+	@GetMapping("Listar")
+	public ResponseEntity<List<DeviceDataTransferObject>> getAllDevices() {
 		List<Device> devices = deviceRepository.findAll();
-		List<DeviceDataTransferObject> deviceDataTransferObjects = devices.stream()
-				.map(DeviceMapper::convertToDTO)
+		List<DeviceDataTransferObject> deviceDataTransferObjects = devices.stream().map(DeviceMapper::convertToDTO)
 				.collect(Collectors.toList());
 		return ResponseEntity.ok(deviceDataTransferObjects);
 	}
-	
 
-	//Rotas para buscar um dispositivo pelo ID
+	// Rotas para buscar um dispositivo pelo ID
 	@PreAuthorize("hasAnyRole('ADMIN', 'COMMON_USER')")
-	@GetMapping("/{id}")
-	public ResponseEntity<DeviceDataTransferObject> getDeviceById(@PathVariable Long id){
-		
-			DeviceDataTransferObject deviceDataTransferObject = deviceService.findDeviceById(id);
-			return ResponseEntity.ok(deviceDataTransferObject);	
+	@GetMapping("Buscar/{id}")
+	public ResponseEntity<DeviceDataTransferObject> getDeviceById(@PathVariable Long id) {
+
+		DeviceDataTransferObject deviceDataTransferObject = deviceService.findDeviceById(id);
+		return ResponseEntity.ok(deviceDataTransferObject);
 	}
-	
-	//rota para atualizar um dispositivo
+
+	// rota para atualizar um dispositivo
 	@PreAuthorize("hasRole('ADMIN')")
-		@PutMapping("/{id}")
-		public ResponseEntity<Device> updateDevice(@PathVariable Long id, @RequestBody Device deviceDetails){	
-			return deviceRepository.findById(id)
-					.map(device -> {
-						device.setName(deviceDetails.getName());
-						device.setIpAddress(deviceDetails.getIpAddress());
-						device.setLocation(deviceDetails.getLocation());
-						Device updateDevice = deviceRepository.save(device);
-						return ResponseEntity.ok(updateDevice);
-					}).orElse(ResponseEntity.notFound().build());
-			
-		}
+	@PutMapping("Update/{id}")
+	public ResponseEntity<Device> updateDevice(@PathVariable Long id, @RequestBody Device deviceDetails) {
+		Device device = deviceService.findDeviceById(id).toEntity();
+
+		device.setName(deviceDetails.getName());
+		device.setIpAddress(deviceDetails.getIpAddress());
+		device.setLocation(deviceDetails.getLocation());
+
+		Device updateDevice = deviceRepository.save(device);
+		return ResponseEntity.ok(updateDevice);
+	}
+
+	// Para deletar um disposito baseado no seu id
+	@PreAuthorize("hasRole('ADMIN')")
+	@DeleteMapping("delete/{id}")
+	public ResponseEntity<Void> deleteDevice(@PathVariable Long id) {
 		
-		//Para deletar um disposito baseado no seu id
-		@PreAuthorize("hasRole('ADMIN')")
-		@DeleteMapping("/{id}")
-		public ResponseEntity<Void> deleteDevice(@PathVariable Long id){
-			if(!deviceRepository.existsById(id)){
-				return ResponseEntity.notFound().build(); //retorna 404 se não encontrar o id
-			}
-			
-			deviceRepository.deleteById(id);//Exclui o dispositivo se tiver o id
-			return ResponseEntity.noContent().build();//Retorno 204 No content
+		DeviceDataTransferObject device = deviceService.findDeviceById(id);
+		
+		if(device.getVulnerabilities() != null && !device.getVulnerabilities().isEmpty()) {
+			throw new DeviceDependencyException("Erro!\n O Dispositivo possui vulnerabilidade associadas e não pode ser excluído.");
 		}
-	
-	
+
+		deviceRepository.deleteById(id);// Exclui o dispositivo se tiver o id
+		return ResponseEntity.noContent().build();// Retorno 204 No content
+	}
+
 }

@@ -1,7 +1,8 @@
 package com.api.digital.security.model;
 
-import java.util.ArrayList;
+
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -23,8 +24,8 @@ public class Device {
 	private String ipAddress;
 	private String location;
 	
-	@OneToMany(mappedBy = "device", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	private List<Vulnerabilities> vulnerabilities = new ArrayList<>();
+	@OneToMany(mappedBy = "device", cascade = CascadeType.PERSIST)
+	private List<Vulnerabilities> vulnerabilities = new CopyOnWriteArrayList<>();
 	
 	
 	public Long getId() {
@@ -52,6 +53,11 @@ public class Device {
 		this.location = location;
 	}
 	public List<Vulnerabilities> getVulnerabilities() {
+		
+		if(vulnerabilities == null) {
+			vulnerabilities = new CopyOnWriteArrayList<>();
+		}
+		
 		return vulnerabilities;
 	}
 	public void setVulnerabilities(List<Vulnerabilities> vulnerabilities) {

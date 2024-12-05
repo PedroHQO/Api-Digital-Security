@@ -2,8 +2,12 @@ package com.api.digital.security.dto;
 
 import java.util.List;
 
+import org.springframework.stereotype.Component;
+
+import com.api.digital.security.model.Device;
 
 
+@Component
 public class DeviceDataTransferObject {
 	
 	private Long id;
@@ -11,6 +15,8 @@ public class DeviceDataTransferObject {
 	private String ipAddress;
 	private String location;
 	private List<VulnerabilityDataTransferObject> vulnerabilities;
+	
+	
 	public Long getId() {
 		return id;
 	}
@@ -40,6 +46,16 @@ public class DeviceDataTransferObject {
 	}
 	public void setVulnerabilities(List<VulnerabilityDataTransferObject> vulnerabilities) {
 		this.vulnerabilities = vulnerabilities;
+	}
+	
+	public Device toEntity() {
+		Device device = new Device();
+		device.setId(this.getId());
+		device.setIpAddress(this.getIpAddress());
+		device.setLocation(this.getLocation());
+		device.setName(this.getName());
+		
+		return device;
 	}
 	
 	
