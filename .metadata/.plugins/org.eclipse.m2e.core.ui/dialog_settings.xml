@@ -2,6 +2,7 @@
 <section name="Workbench">
 	<section name="MavenProjectImportWizardPage">
 		<list key="rootDirectory">
+			<item value="C:\Users\Tool Business\eclipse-workspace\javaThymeleaf\thymeleaf"/>
 			<item value="C:\Users\Tool Business\eclipse-workspace\api.digital.security"/>
 		</list>
 		<list key="projectNameTemplate">
