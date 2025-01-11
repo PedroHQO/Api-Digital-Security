@@ -1,0 +1,1 @@
+web: mvn sprig-boot:run
